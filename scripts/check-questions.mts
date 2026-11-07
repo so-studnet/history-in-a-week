@@ -2,6 +2,7 @@
  * 問題データ（src/data/questions/*.json）を検証し、配分を表示する。
  *   npm run questions:check            # 検証と配分の表示
  *   npm run questions:check -- --strict-coverage  # 問題が 0 の単元があれば失敗
+ *   npm run questions:check -- --only u01,u02     # 指定したファイルだけ検証（作成中の他ファイルを無視）
  * Node の型除去で直接動かすので、import は拡張子付きの相対パスにする。
  */
 import { readdirSync, readFileSync } from "node:fs";
@@ -10,8 +11,19 @@ import { validateBank, QUESTION_FORMATS } from "../src/lib/domain/question.ts";
 import { UNITS, TOPICS, UNIT_IDS, TOPIC_IDS } from "../src/data/units.ts";
 
 const dir = join(import.meta.dirname, "../src/data/questions");
+const onlyArg = process.argv.find((a) => a.startsWith("--only"));
+const onlyIdx = process.argv.indexOf("--only");
+const only = onlyArg?.includes("=")
+  ? onlyArg.split("=")[1].split(",")
+  : onlyIdx >= 0
+    ? process.argv[onlyIdx + 1].split(",")
+    : null;
 const raw: unknown[] = [];
-for (const file of readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
+const files = readdirSync(dir)
+  .filter((f) => f.endsWith(".json"))
+  .filter((f) => !only || only.includes(f.replace(/\.json$/, "")))
+  .sort();
+for (const file of files) {
   const data = JSON.parse(readFileSync(join(dir, file), "utf8"));
   if (!Array.isArray(data)) {
     console.error(`${file}: 配列ではありません`);
