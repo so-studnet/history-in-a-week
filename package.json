@@ -9,8 +9,11 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "next typegen && tsc --noEmit",
-    "questions:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-questions.mts",
-    "check": "bash scripts/check.sh"
+    "questions:check": "npm run questions:index --silent && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-questions.mts",
+    "check": "bash scripts/check.sh",
+    "questions:index": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-bank-index.mts",
+    "predev": "npm run questions:index --silent",
+    "prebuild": "npm run questions:index --silent"
   },
   "dependencies": {
     "next": "16.4.5",

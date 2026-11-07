@@ -135,3 +135,17 @@ describe("daysUntilExam", () => {
     expect(daysUntilExam(Date.parse("2026-11-14T15:30:00Z"))).toBe(0); // JST では15日 0:30
   });
 });
+
+import { groupStats } from "./stats";
+describe("groupStats", () => {
+  it("解いた数・正答率・復習中の数を数える", () => {
+    const progress = deriveProgress([
+      { id: "1", questionId: "a", correct: true, answeredAt: 1 },
+      { id: "2", questionId: "b", correct: false, answeredAt: 2 },
+      { id: "3", questionId: "b", correct: true, answeredAt: 3 },
+      { id: "4", questionId: "x", correct: true, answeredAt: 4 },
+    ]);
+    expect(groupStats(["a", "b", "c"], progress)).toEqual({ total: 3, seen: 2, attempts: 3, correct: 2, rate: 2 / 3, inReview: 1 });
+    expect(groupStats(["c"], progress).rate).toBeNull();
+  });
+});
