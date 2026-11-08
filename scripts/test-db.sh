@@ -29,6 +29,6 @@ done
 "${PSQL[@]}" -d app -c "grant usage on schema public to anon, authenticated, service_role; grant select, insert, update, delete on all tables in schema public to anon, authenticated, service_role;"
 for f in "$ROOT"/supabase/tests/*.test.sql; do
   # テストごとにデータを空にする
-  "${PSQL[@]}" -d app -c "truncate public.answers, public.reports, auth.users cascade"
+  "${PSQL[@]}" -d app -c "truncate public.hiaw_answers, public.hiaw_reports, auth.users cascade"
   "${PSQL[@]}" -d app -f "$f"
 done

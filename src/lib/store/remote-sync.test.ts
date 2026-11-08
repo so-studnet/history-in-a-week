@@ -48,8 +48,8 @@ function memoryStore(initial: AnswerData): AnswerStore & { data: AnswerData } {
 describe("RemoteSync", () => {
   it("サーバーの行を手元に足し、手元にしかない行だけを送る", async () => {
     const { client, upserts } = fakeSupabase({
-      answers: [{ id: "s1", question_id: "q1", correct: true, answered_at: "2026-11-08T00:00:00+00:00" }],
-      reports: [],
+      hiaw_answers: [{ id: "s1", question_id: "q1", correct: true, answered_at: "2026-11-08T00:00:00+00:00" }],
+      hiaw_reports: [],
     });
     const store = memoryStore({
       answers: [{ id: "l1", questionId: "q2", correct: false, answeredAt: Date.parse("2026-11-08T01:00:00Z") }],
@@ -68,7 +68,7 @@ describe("RemoteSync", () => {
   });
 
   it("送信に失敗したらエラーになるが、手元の記録は残る", async () => {
-    const { client } = fakeSupabase({ answers: [], reports: [] }, { failUpsert: true });
+    const { client } = fakeSupabase({ hiaw_answers: [], hiaw_reports: [] }, { failUpsert: true });
     const store = memoryStore({ answers: [{ id: "l1", questionId: "q", correct: true, answeredAt: 1 }], reports: [] });
     const sync = new RemoteSync(client, store);
     await sync.syncNow();

@@ -3,13 +3,17 @@
 PC とスマホで解答の記録をそろえるための設定です。所要時間は 10〜15 分ほど。
 **Secret key（`sb_secret_...`）は使いません。会話にも貼らないでください。**
 
-## 1. プロジェクトを作る
+## 1. プロジェクトを用意する
+
+### 無料枠（2 プロジェクト）が埋まっている場合：既存のプロジェクトに同居させる（おすすめ）
+- このアプリのテーブルは `hiaw_` で始まる名前なので、他のアプリのテーブルとぶつからない
+- ログインのユーザーもそのプロジェクトのものを共用する。他のアプリで使っているメールアドレスとパスワードでそのままログインできる
+- Supabase のダッシュボードで、同居させるプロジェクトを開いて 2 に進む
+
+### 空きがある場合：新しく作る
 1. https://supabase.com を開き、右上の「Sign in」→「Continue with GitHub」でログイン
 2. 「New project」を押す
-3. 入力欄
-   - Project name：`history-in-a-week`
-   - Database Password：右の「Generate a password」を押す（このアプリでは使わないので控えなくてよい）
-   - Region：**Northeast Asia (Tokyo)**
+3. Project name：`history-in-a-week`、Database Password：「Generate a password」、Region：**Northeast Asia (Tokyo)**
 4. 「Create new project」を押し、1〜2 分待つ
 
 ## 2. テーブルを作る（SQL を実行）
@@ -17,13 +21,13 @@ PC とスマホで解答の記録をそろえるための設定です。所要�
 2. 右上の「+」→「Create a new snippet」
 3. リポジトリの `supabase/migrations/20261108000000_init.sql` の中身を全部貼り付ける
 4. 右下の「Run」を押し、下に「Success. No rows returned」と出れば完了
-5. 左のメニュー「Table Editor」に `answers` と `reports` が出ていることを確かめる
+5. 左のメニュー「Table Editor」に `hiaw_answers` と `hiaw_reports` が出ていることを確かめる
 
-## 3. ログイン用のユーザーを作る
+## 3. ログイン用のユーザーを作る（同居させる場合、自分のユーザーがすでにあれば飛ばす）
 1. 左のメニュー「Authentication」→「Users」
 2. 右上の「Add user」→「Create new user」
 3. 自分のメールアドレスとパスワードを入れ、**「Auto Confirm User」にチェック**して「Create user」
-4. 他人に使われないよう、新規登録を止める：「Authentication」→「Sign In / Providers」→「Allow new users to sign up」を**オフ**→「Save changes」
+4. 新しく作ったプロジェクトなら、他人に使われないよう新規登録を止める（同居させる場合は、他のアプリの設定に合わせてそのままでよい）：「Authentication」→「Sign In / Providers」→「Allow new users to sign up」を**オフ**→「Save changes」
 
 ## 4. 接続情報を Vercel に設定する
 1. Supabase 左下の歯車「Project Settings」→「API Keys」
@@ -45,4 +49,4 @@ PC とスマホで解答の記録をそろえるための設定です。所要�
 |---|---|
 | 「ログインして同期」が出ない | Vercel の環境変数の名前のつづり、Redeploy したか |
 | メールアドレスかパスワードが違う | Supabase の Authentication → Users にユーザーがあるか、Auto Confirm したか |
-| 「同期エラー」 | 2 の SQL を実行したか（Table Editor に answers があるか） |
+| 「同期エラー」 | 2 の SQL を実行したか（Table Editor に hiaw_answers があるか） |

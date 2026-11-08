@@ -108,8 +108,8 @@ export class RemoteSync {
 
   private async cycle() {
     const [answerRows, reportRows] = await Promise.all([
-      readAll<AnswerRow>(this.supabase, "answers", "id, question_id, correct, answered_at", "answered_at"),
-      readAll<ReportRow>(this.supabase, "reports", "id, question_id, note, reported_at", "reported_at"),
+      readAll<AnswerRow>(this.supabase, "hiaw_answers", "id, question_id, correct, answered_at", "answered_at"),
+      readAll<ReportRow>(this.supabase, "hiaw_reports", "id, question_id, note, reported_at", "reported_at"),
     ]);
     const remote = {
       answers: answerRows.map(rowToAnswer).filter((x): x is AnswerRecord => x !== null),
@@ -121,13 +121,13 @@ export class RemoteSync {
     const toSend = unsent(this.store.getSnapshot(), serverIds);
     for (let i = 0; i < toSend.answers.length; i += PAGE) {
       const { error } = await this.supabase
-        .from("answers")
+        .from("hiaw_answers")
         .upsert(toSend.answers.slice(i, i + PAGE).map(answerToRow), { onConflict: "id", ignoreDuplicates: true });
       if (error) throw error;
     }
     if (toSend.reports.length > 0) {
       const { error } = await this.supabase
-        .from("reports")
+        .from("hiaw_reports")
         .upsert(toSend.reports.map(reportToRow), { onConflict: "id", ignoreDuplicates: true });
       if (error) throw error;
     }
