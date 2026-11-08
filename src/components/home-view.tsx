@@ -88,6 +88,17 @@ export function HomeView() {
         </Link>
       </section>
 
+      <Link
+        href={practiceHref("basic")}
+        className="mt-3 flex items-center justify-between rounded-2xl border-2 border-indigo-200 px-4 py-3 active:bg-indigo-50 dark:border-indigo-900 dark:active:bg-indigo-950"
+      >
+        <span>
+          <span className="block font-bold">基本用語から10問</span>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">教科書の太字語を一問一答で。すきま時間に</span>
+        </span>
+        <StatLine s={groupStats(questionIdsInScope("basic"), progress)} />
+      </Link>
+
       <p className="mt-3 flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
         <span>
           全体 {all.seen}/{all.total}問{all.rate !== null && ` ・ 正答率 ${Math.round(all.rate * 100)}%`}
