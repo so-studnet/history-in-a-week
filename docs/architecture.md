@@ -6,7 +6,7 @@
 |---|---|---|
 | 画面 | Next.js 16（App Router）+ React 19 + TypeScript + Tailwind CSS 4 | 情報が多く Claude と相性がよい。スマホ向けの画面も速く作れる |
 | 問題データ | `src/data/questions/*.json` + Zod で検証 | Git で履歴が残り、直しやすい。サーバー不要 |
-| 解答の記録 | 最初は localStorage、M5 で Supabase（Auth + PostgreSQL + RLS）に同期 | すぐ使い始められ、後から保存先だけ差し替える |
+| 解答の記録 | localStorage を正とし、ログイン中は Supabase（Auth + PostgreSQL + RLS）と同期 | 記録は追記だけなので、同期は ID の和集合で済み、オフラインでも解ける |
 | 公開 | Vercel | GitHub に push すると公開される |
 | テスト | Vitest（ロジック）、Playwright（画面の確認） | |
 | 問題の生成 | Claude Code のサブエージェント（作成役・検証役）+ `scripts/check-questions.mts` | 実行時に AI を使わないので、全問を確認済みにできる |
@@ -51,3 +51,12 @@ src/data/units.ts          出題範囲マップ（単元・頻出テーマ）
 src/data/questions/*.json  問題データ（単元・テーマごとに1ファイル）
 src/lib/domain/            純粋関数とテスト
 ```
+
+## 同期（M5）
+
+- テーブル `hiaw_answers`・`hiaw_reports`（他のアプリと同じプロジェクトに同居できるよう接頭辞を付ける）（`supabase/migrations/`）。どちらも追記だけで、RLS は本人の select と insert のみ（更新・削除のポリシーはない）
+- `src/lib/store/remote-sync.ts`：ログイン中、「サーバーから全部読む → 手元に足す → サーバーにない行を `on conflict do nothing` で送る」を、起動時・解答の 1.5 秒後・画面復帰・通信回復のたびに行う
+- `src/lib/domain/sync.ts`：和集合・未送信の抽出・DB の行との変換（純粋関数）
+- `src/lib/supabase/auth.ts`：ログイン状態を見て同期を開始・停止する。環境変数が未設定ならブラウザ内保存だけで動く
+- DB のテストは `npm run test:db`（一時的な PostgreSQL でマイグレーションと RLS を確かめる）
+- 同じブラウザで別のアカウントにログインすると、そのブラウザの記録はそのアカウントにも送られる（1 人で使う前提）

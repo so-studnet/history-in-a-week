@@ -11,7 +11,7 @@ export const TOPIC_BY_ID: ReadonlyMap<string, Topic> = new Map(TOPICS.map((t) =>
 
 /**
  * 出題範囲。URL の ?scope= に入れる文字列。
- *   all / set:unit / set:frequent / era:古代 / unit:u21 / topic:t-places / review
+ *   all / basic / set:unit / set:frequent / era:古代 / unit:u21 / topic:t-places / review
  */
 export type Scope = string;
 
@@ -22,6 +22,8 @@ export function questionIdsInScope(scope: Scope): string[] {
       case "all":
       case "review":
         return true;
+      case "basic":
+        return q.format === "term" && q.difficulty === 1;
       case "set":
         return q.set === value;
       case "era":
@@ -44,6 +46,8 @@ export function scopeLabel(scope: Scope): string {
       return "全範囲";
     case "review":
       return "苦手の復習";
+    case "basic":
+      return "基本用語";
     case "set":
       return value === "frequent" ? "頻出テーマ（全部）" : "時代・地域（全部）";
     case "era":

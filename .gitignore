@@ -43,3 +43,4 @@ next-env.d.ts
 # 問題集など著作物の原文（公開リポジトリには載せない）
 /sources/raw/*
 !/sources/raw/.gitkeep
+!.env.example
