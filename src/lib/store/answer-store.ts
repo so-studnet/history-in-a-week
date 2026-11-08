@@ -3,13 +3,10 @@
  * 今はブラウザ内保存（localStorage）。M5 で Supabase と同期する実装に差し替える。
  */
 import type { AnswerRecord } from "@/lib/domain/progress";
+import { mergeSyncData, sameIds, type ReportRecord, type SyncData } from "@/lib/domain/sync";
 
-export type ProblemReport = { id: string; questionId: string; note: string; createdAt: number };
-
-export type AnswerData = {
-  answers: readonly AnswerRecord[];
-  reports: readonly ProblemReport[];
-};
+export type ProblemReport = ReportRecord;
+export type AnswerData = SyncData;
 
 export interface AnswerStore {
   subscribe(listener: () => void): () => void;
@@ -17,6 +14,10 @@ export interface AnswerStore {
   getServerSnapshot(): AnswerData;
   addAnswer(record: AnswerRecord): void;
   addReport(report: ProblemReport): void;
+  /** サーバーから読んだデータを合わせる（手元にない行だけ足す） */
+  mergeRemote(remote: AnswerData): void;
+  /** 記録が追加されたときに呼ばれる（同期の送信のきっかけ） */
+  onAdd(listener: () => void): () => void;
 }
 
 const EMPTY: AnswerData = { answers: [], reports: [] };
@@ -79,8 +80,27 @@ export class LocalAnswerStore implements AnswerStore {
 
   getServerSnapshot = (): AnswerData => EMPTY;
 
-  addAnswer = (record: AnswerRecord) => this.update((d) => ({ ...d, answers: [...d.answers, record] }));
-  addReport = (report: ProblemReport) => this.update((d) => ({ ...d, reports: [...d.reports, report] }));
+  private addListeners = new Set<() => void>();
+
+  addAnswer = (record: AnswerRecord) => {
+    this.update((d) => ({ ...d, answers: [...d.answers, record] }));
+    for (const l of this.addListeners) l();
+  };
+  addReport = (report: ProblemReport) => {
+    this.update((d) => ({ ...d, reports: [...d.reports, report] }));
+    for (const l of this.addListeners) l();
+  };
+  mergeRemote = (remote: AnswerData) => {
+    const current = this.getSnapshot();
+    const merged = mergeSyncData(current, remote);
+    if (!sameIds(current, merged)) this.update(() => merged);
+  };
+  onAdd = (listener: () => void) => {
+    this.addListeners.add(listener);
+    return () => {
+      this.addListeners.delete(listener);
+    };
+  };
 
   private update(fn: (d: AnswerData) => AnswerData) {
     this.data = fn(this.getSnapshot());

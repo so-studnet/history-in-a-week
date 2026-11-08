@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { SyncBoot } from "@/components/sync-boot";
 
 export const metadata: Metadata = {
   title: "歴検2級 世界史 直前演習",
@@ -14,7 +15,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ja" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <SyncBoot />
+        {children}
+      </body>
     </html>
   );
 }

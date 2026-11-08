@@ -6,6 +6,7 @@ import { daysUntilExam } from "@/lib/domain/countdown";
 import { pickDueReviews, countInReview } from "@/lib/domain/selection";
 import { groupStats, type GroupStats } from "@/lib/domain/stats";
 import { useNow, useProgress } from "@/lib/store/use-answers";
+import { SyncBadge } from "./sync-badge";
 
 const ALL_IDS = QUESTIONS.map((q) => q.id);
 
@@ -62,6 +63,7 @@ export function HomeView() {
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">歴史能力検定 世界史2級</p>
           <h1 className="text-xl font-bold">直前演習</h1>
+          <SyncBadge />
         </div>
         <p className="text-right">
           <span className="block text-xs text-zinc-500 dark:text-zinc-400">11/15（日）まで</span>

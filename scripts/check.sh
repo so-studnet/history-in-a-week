@@ -6,6 +6,7 @@ step() { printf '\n=== %s ===\n' "$1"; }
 step "問題データの検証"; npm run questions:check --silent
 step "単体テスト (Vitest)"; npm test --silent
 step "lint"; npm run lint --silent
+if [ "${SKIP_DB:-}" != "1" ]; then step "DB テスト (マイグレーションと RLS)"; npm run test:db --silent >/dev/null; fi
 step "型チェック"; npm run typecheck --silent
 step "本番ビルド"; rm -rf .next; npm run build --silent >/dev/null; rm -rf .next
 printf '\nすべてのチェックが通りました\n'
