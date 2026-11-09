@@ -74,24 +74,15 @@ function QuizSession({ scope, onRestart }: { scope: string; onRestart: () => voi
 
   return (
     <Shell scope={scope} progress={`${index + 1} / ${items.length}`}>
-      <QuestionCard item={item} onChoose={choose} />
-      {answered && (
-        <>
-          <div className="h-28" aria-hidden />
-          <div className="fixed inset-x-0 bottom-0 border-t border-zinc-200 bg-background/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur dark:border-zinc-800">
-            <button
-              type="button"
-              onClick={() => {
-                setIndex(index + 1);
-                window.scrollTo({ top: 0 });
-              }}
-              className="mx-auto block w-full max-w-xl rounded-xl bg-indigo-600 py-4 text-lg font-bold text-white active:bg-indigo-700"
-            >
-              {index + 1 < items.length ? "次の問題へ" : "結果を見る"}
-            </button>
-          </div>
-        </>
-      )}
+      <QuestionCard
+        item={item}
+        onChoose={choose}
+        nextLabel={index + 1 < items.length ? "次の問題へ" : "結果を見る"}
+        onNext={() => {
+          setIndex(index + 1);
+          window.scrollTo({ top: 0 });
+        }}
+      />
     </Shell>
   );
 }
@@ -111,7 +102,17 @@ function Shell({ scope, progress, children }: { scope: string; progress?: string
   );
 }
 
-function QuestionCard({ item, onChoose }: { item: Item; onChoose: (k: number) => void }) {
+function QuestionCard({
+  item,
+  onChoose,
+  nextLabel,
+  onNext,
+}: {
+  item: Item;
+  onChoose: (k: number) => void;
+  nextLabel: string;
+  onNext: () => void;
+}) {
   const { question, order, displayAnswer, chosen } = item;
   const answered = chosen !== null;
   const unit = UNIT_BY_ID.get(question.unitId);
@@ -125,15 +126,23 @@ function QuestionCard({ item, onChoose }: { item: Item; onChoose: (k: number) =>
       <h2 className="whitespace-pre-wrap text-[17px] leading-relaxed">{question.stem}</h2>
 
       {answered && (
-        <p
-          className={`mt-4 rounded-xl px-4 py-2 text-center text-lg font-bold ${
+        <div
+          className={`mt-4 flex items-center justify-between gap-3 rounded-xl py-2 pl-4 pr-2 text-lg font-bold ${
             chosen === displayAnswer
               ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
               : "bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200"
           }`}
         >
-          {chosen === displayAnswer ? "○ 正解" : `× 不正解（正解は ${LABELS[displayAnswer]}）`}
-        </p>
+          <span>{chosen === displayAnswer ? "○ 正解" : `× 不正解（正解は ${LABELS[displayAnswer]}）`}</span>
+          {/* 解説を読まずに進みたいとき用。読み終えたら下の大きいボタンで進む */}
+          <button
+            type="button"
+            onClick={onNext}
+            className="shrink-0 rounded-lg bg-white/80 px-3 py-1.5 text-sm font-bold text-zinc-900 active:bg-white dark:bg-zinc-900/60 dark:text-zinc-100"
+          >
+            {nextLabel} →
+          </button>
+        </div>
       )}
 
       <ol className="mt-4 space-y-3">
@@ -183,6 +192,15 @@ function QuestionCard({ item, onChoose }: { item: Item; onChoose: (k: number) =>
 
       {answered && question.note && (
         <p className="mt-4 rounded-xl bg-zinc-100 px-4 py-3 text-sm leading-relaxed dark:bg-zinc-800">{question.note}</p>
+      )}
+      {answered && (
+        <button
+          type="button"
+          onClick={onNext}
+          className="mt-6 w-full rounded-xl bg-indigo-600 py-4 text-lg font-bold text-white active:bg-indigo-700"
+        >
+          {nextLabel}
+        </button>
       )}
       {answered && <ReportBox questionId={question.id} />}
     </article>
