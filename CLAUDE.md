@@ -4,7 +4,7 @@
 
 ## ドキュメント
 - `docs/requirements.md` 要件 / `docs/architecture.md` 設計 / `docs/roadmap.md` 進み具合
-- `docs/exam-research.md` 試験の調査 / `docs/question-generation.md` 問題の作り方
+- `docs/exam-research.md` 試験の調査 / `docs/question-generation.md` 問題の作り方 / `docs/retrospective.md` 本番後の振り返り
 - `sources/README.md` 問題集テキストの受け取り方（原文は `sources/raw/` に置き、コミットしない）
 
 ## 開発ルール
